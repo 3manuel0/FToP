@@ -83,7 +83,8 @@ void writeFileToIamge(char* file, int c){
         exit(1);
     }
 
-    size_t count =  extLength+1; 
+    size_t count =  extLength+1;
+    // writing extention to a example svg 
     for(int i = 0; i <= extLength - 1; i++){
         a[i] = file[(c + 1)+i];
         printf("%c %d\t", file[(c + 1)+i], file[(c + 1)+i]);
@@ -93,7 +94,7 @@ void writeFileToIamge(char* file, int c){
 
     int j;
     char * int_bytes = (char *)(&bytes);
-
+    // writing the size of the file in bytes to an int
     for(int i = 0; i < 4; i++){
         a[extLength + i] = int_bytes[i];
         printf("%d %ld\n", int_bytes[i], bytes);
