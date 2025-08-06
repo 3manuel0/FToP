@@ -1,17 +1,16 @@
-// #ifndef PLATFORM_WEB
-#include <bits/types/FILE.h>
+#include "includes/pixels.h"
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "includes/pixels.h"
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "includes/stb_image.h"
 #include "includes/stb_image_write.h"
-// #endif
 
+
+#ifdef PLATFORM_WEB
+#endif
 
 
 int main(int argc, char**argV){
@@ -83,7 +82,7 @@ void writeFileToIamge(char* file, int c){
         exit(1);
     }
 
-    size_t count =  extLength+1;
+    // size_t count =  extLength+1;
     // writing extention to a example svg 
     for(int i = 0; i <= extLength - 1; i++){
         a[i] = file[(c + 1)+i];
@@ -148,3 +147,5 @@ void writeImageToFile(char* fileName){
     fclose(fp);
     stbi_image_free(img.data);
 }
+
+

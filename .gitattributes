@@ -1,2 +1,4 @@
 includes/stb_image.h linguist-vendored
 includes/stb_image_write.h linguist-vendored
+libs/pako.js linguist-vendored
+libs/UPNG.js linguist-vendored
