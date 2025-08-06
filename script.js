@@ -13,6 +13,18 @@ function make_environment(env) {
 }
 
 let wasm;
+const fileInput = document.getElementById("file");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const textArea = document.getElementById("text");
+const showCanvasBtn = document.getElementById("show-canvas");
+const showDetailsBtn = document.getElementById("show-details");
+// const printableExtensions = ["c", "html", "txt", "java", "json", "svg"];
+const width = 800;
+const height = 600;
+textArea.style.width = width + "px";
+textArea.style.height = height + "px";
+
 // getting Cstring length in memory
 const str_len = (mem, str_ptr) => {
   let len = 0;
@@ -35,12 +47,44 @@ const get_str = (str_ptr) => {
 // Instintiating webassembly
 WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
   env: make_environment({
-    writeImageToFileWasm: (img_ptr, str_ptr, num) => {
+    printf: (str_ptr, args_ptrs) => {
       const buffer = wasm.instance.exports.memory.buffer;
-      const [img_array_ptr, x, y, comp] = new Uint32Array(buffer, img_ptr, 4);
-      const img_array = new Uint8Array(buffer, img_array_ptr, 600 * 800 * 4);
-      console.log(img_ptr, img_array_ptr, x, y, comp);
-      console.log(img_array);
+      const str = get_str(str_ptr);
+      let args = [];
+      let argsIndex = 0;
+      for (let i = 0; i < str.length; i++) {
+        if (str[i] === "%") {
+          switch (str[i + 1]) {
+            case "f":
+              args.push(new Float64Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              argsIndex += 8;
+              break;
+            case "d":
+              args.push(new Int32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              argsIndex += 4;
+              break;
+            case "u":
+              args.push(new Uint32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              argsIndex += 4;
+              break;
+            case "s":
+              const str_ptr = new Uint32Array(
+                buffer,
+                args_ptrs + argsIndex,
+                1
+              )[0];
+              args.push(get_str(str_ptr));
+              argsIndex += 4;
+              break;
+            case "i":
+              args.push(new Int32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              argsIndex += 4;
+              break;
+          }
+        }
+      }
+      console.log(str, args);
+      // console.log(get_str(args_ptrs), new Uint32Array(buffer, args_ptrs, 1));
     },
   }),
 }).then((w) => {
@@ -55,16 +99,28 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
     get_file_name_ptr,
     get_file_buffer_ptr,
     get_image_buffer_ptr,
-    writeImageToMemory,
+    writeImageFromFIleToMemory,
   } = w.instance.exports;
 
   // const pointers to arrays
   const file_buffer_ptr = get_file_buffer_ptr();
   const image__buffer_ptr = get_image_buffer_ptr();
   const file_name_ptr = get_file_name_ptr();
-
-  writeImageToMemory(file_buffer_ptr, BUFF_SIZE, 0);
-  console.log(new Uint8Array(buffer, file_buffer_ptr, 600 * 800 * 4));
-  empty_buffers();
-  console.log(new Uint8Array(buffer, file_buffer_ptr, 600 * 800 * 4));
+  fileInput.addEventListener("change", (event) => {
+    // get file from input
+    let file = event.target.files[0];
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(file.name);
+    const wasmMemoryView = new Uint8Array(buffer);
+    wasmMemoryView.set(uint8Array, file_name_ptr);
+    console.log(get_str(file_name_ptr), file.size);
+    writeImageFromFIleToMemory(file.size);
+    console.log(new Uint8Array(buffer, file_buffer_ptr, 500));
+  });
+  //const file_buffer = new Uint8Array(buffer, file_buffer_ptr, BUFF_SIZE);
+  //const image_buffer = new Uint8Array(buffer, image__buffer_ptr, BUFF_SIZE);
+  // empty_buffers();
+  console.log(file_name_ptr);
+  console.log(buffer);
+  // console.log(get_str(file_name_ptr));
 });

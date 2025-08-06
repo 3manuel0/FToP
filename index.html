@@ -7,21 +7,102 @@
     <title>wasm</title>
   </head>
   <style>
-    @font-face {
-      font-family: grixel;
-      src: url("assets/font/Acme_7_Wide_Xtnd.ttf");
+    *::before,
+    *::after {
+      margin: 0;
     }
     body {
       background-color: #121212;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0;
-      padding: 0 0.4rem;
       height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      color: white;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    button {
+      background-color: transparent;
+      color: white;
+    }
+
+    .custom-file-upload,
+    button {
+      border: 1px solid rgb(41, 122, 251);
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-family: "Courier New", Courier, monospace;
+    }
+    svg {
+      max-width: 760px;
+      max-height: 400px;
+    }
+    p {
+      padding: 0.2rem 0.3rem;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    #display {
+      display: flex;
+      position: relative;
+      justify-content: center;
+    }
+    #canvas {
+      background-color: white;
+      border: rgb(41, 122, 251) 2px solid;
+    }
+    #text {
+      resize: none;
+      display: none;
+      background-color: white;
+      border: rgb(41, 122, 251) 2px solid;
+      outline: none;
+      font-size: 1.2rem;
+      font-family: sans-serif;
+      min-width: 800px;
+      min-height: 600px;
+      color: black;
+      padding: 0px;
+    }
+    #show-details,
+    #show-canvas {
+      width: 5%;
+      writing-mode: vertical-lr;
+      text-orientation: upright;
+    }
+
+    #content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    #content::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+
+    #content::-webkit-scrollbar-thumb {
+      background-color: #121212;
+      border: 1px rgb(41, 122, 251) solid;
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
     }
   </style>
-  <body></body>
+  <body>
+    <label for="file" class="custom-file-upload"> Upload File/PNG Image</label>
+    <input type="file" name="" id="file" />
+    <div id="display">
+      <button id="show-canvas">Show Image</button>
+      <div id="text" contenteditable="true">
+        Upload a file that is < 1.8 mb and transform it into a png image
+      </div>
+      <canvas id="canvas" width="800" height="600"></canvas>
+      <button id="show-details">Show Details</button>
+    </div>
+    <button id="dwn">Download Output File</button>
+  </body>
   <script src="libs/pako.js"></script>
   <script src="libs/UPNG.js"></script>
   <script src="script.js"></script>
