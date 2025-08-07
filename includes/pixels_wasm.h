@@ -13,7 +13,7 @@ typedef unsigned int u32;
 
 static u8 image_array[BUFF_SIZE];
 static u8 file_array[BUFF_SIZE];
-static u8 file_name[255];
+static u8 file_name[STR_SIZE];
 
 
 void writeImageFromFIleToMemory(i32 size);

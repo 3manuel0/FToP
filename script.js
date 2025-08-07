@@ -50,22 +50,32 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
     printf: (str_ptr, args_ptrs) => {
       const buffer = wasm.instance.exports.memory.buffer;
       const str = get_str(str_ptr);
+      let f_str = "";
       let args = [];
       let argsIndex = 0;
       for (let i = 0; i < str.length; i++) {
         if (str[i] === "%") {
           switch (str[i + 1]) {
             case "f":
-              args.push(new Float64Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              let float = new Float64Array(buffer, args_ptrs + argsIndex, 1)[0];
+              args.push(float);
+              f_str += float;
               argsIndex += 8;
+              i += 2;
               break;
             case "d":
-              args.push(new Int32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              let int = new Int32Array(buffer, args_ptrs + argsIndex, 1)[0];
+              args.push(int);
+              f_str += int;
               argsIndex += 4;
+              i += 2;
               break;
             case "u":
-              args.push(new Uint32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              let uint = new Uint32Array(buffer, args_ptrs + argsIndex, 1)[0];
+              args.push(uint);
+              f_str += uint;
               argsIndex += 4;
+              i += 2;
               break;
             case "s":
               const str_ptr = new Uint32Array(
@@ -73,17 +83,24 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
                 args_ptrs + argsIndex,
                 1
               )[0];
-              args.push(get_str(str_ptr));
+              let str = get_str(str_ptr);
+              args.push(str);
+              f_str += str;
               argsIndex += 4;
+              i += 2;
               break;
             case "i":
-              args.push(new Int32Array(buffer, args_ptrs + argsIndex, 1)[0]);
+              let iint = new Int32Array(buffer, args_ptrs + argsIndex, 1)[0];
+              args.push(iint);
+              f_str += iint;
               argsIndex += 4;
+              i += 2;
               break;
           }
         }
+        if (str[i] != undefined) f_str += str[i];
       }
-      console.log(str, args);
+      console.log(f_str);
       // console.log(get_str(args_ptrs), new Uint32Array(buffer, args_ptrs, 1));
     },
   }),
@@ -104,23 +121,99 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
 
   // const pointers to arrays
   const file_buffer_ptr = get_file_buffer_ptr();
-  const image__buffer_ptr = get_image_buffer_ptr();
+  const image_buffer_ptr = get_image_buffer_ptr();
   const file_name_ptr = get_file_name_ptr();
   fileInput.addEventListener("change", (event) => {
     // get file from input
     let file = event.target.files[0];
-    const encoder = new TextEncoder();
-    const uint8Array = encoder.encode(file.name);
-    const wasmMemoryView = new Uint8Array(buffer);
-    wasmMemoryView.set(uint8Array, file_name_ptr);
-    console.log(get_str(file_name_ptr), file.size);
-    writeImageFromFIleToMemory(file.size);
-    console.log(new Uint8Array(buffer, file_buffer_ptr, 500));
+    if (file) {
+      const encoder = new TextEncoder();
+      const uint8Array = encoder.encode(file.name);
+      const wasmMemoryView = new Uint8Array(buffer);
+      wasmMemoryView.set(uint8Array, file_name_ptr);
+      let reader = new FileReader();
+      // reader loaded successfully
+      reader.onload = (e) => {
+        result = e.target.result;
+        const resultBytes = new Uint8Array(result);
+        console.log(resultBytes);
+        wasmMemoryView.set(resultBytes, file_buffer_ptr);
+        writeImageFromFIleToMemory(file.size);
+        console.log(new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE));
+        createCanvas(new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE));
+        // Download button onclick
+        document.getElementById("dwn").onclick = () => {
+          pngData = UPNG.encode(
+            [new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE)],
+            width,
+            height,
+            0
+          );
+
+          var blob = new Blob([pngData]);
+          const url = URL.createObjectURL(blob);
+          // Trigger download
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "output." + "png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        };
+        /* check if file is bigger than ~ 1.9mb -> 800*600*4
+         minus 40bytes for extension and length */
+      };
+      reader.onerror = (e) => {
+        console.log("Error : " + e.type);
+      };
+      reader.readAsArrayBuffer(file);
+    }
   });
   //const file_buffer = new Uint8Array(buffer, file_buffer_ptr, BUFF_SIZE);
   //const image_buffer = new Uint8Array(buffer, image__buffer_ptr, BUFF_SIZE);
   // empty_buffers();
-  console.log(file_name_ptr);
+  // console.log(file_name_ptr);
   console.log(buffer);
   // console.log(get_str(file_name_ptr));
 });
+
+const createCanvas = (data) => {
+  console.log(data);
+  const imageData = new ImageData(new Uint8ClampedArray(data), width, height);
+  ctx.putImageData(imageData, 0, 0);
+  // let bytes = new Uint8ClampedArray(width * height * 4);
+  // console.log(bytes);
+  // for (let i = 0; i < bytes.length; i++) {
+  //   if (i < fileData.length) {
+  //     // fill empty raw image bytes with file data(it could be duplicated a lot of times)
+  //     bytes[i] = fileData[i];
+  //   } else {
+  //     // filling the rest of the empty bytes with a gary color
+  //     bytes[i] = 50;
+  //   }
+  // }
+  // // encode as PNG with UPNG
+  // pngData = UPNG.encode([bytes.buffer], width, height, 0);
+  // let imageData = new ImageData(bytes, width, height);
+  showCanvas();
+  // ctx.putImageData(imageData, 0, 0);
+};
+
+// show canvas
+const showCanvas = () => {
+  canvas.style.display = "block";
+  textArea.style.display = "none";
+};
+
+// show textArea div
+const showDetails = () => {
+  canvas.style.display = "none";
+  textArea.style.display = "block";
+};
+
+// bind buttons to functions
+showCanvasBtn.onclick = () => showCanvas();
+showDetailsBtn.onclick = () => showDetails();
+
+showDetails();
