@@ -55,8 +55,27 @@ void writeImageFromFIleToMemory(i32 size){
     }
 }
 
-u8 str_len(i8 * str){
-    u8 len = 0;
+i32 writeFileFromImageToMemory(){
+    // TODO : finish this
+    u32 i = 0;
+    while(image_array[i]){
+        file_name[i] = image_array[i];
+        printf("%d ext_char %d", i, file_name[i]);
+        i++;
+    }
+    file_name[i] = 0;
+    // printf("last %d and before last %d", file_name[i], file_name[i-1]);
+    // for(u32 i = 1; i < BUFF_SIZE; i++){
+    //     image_array[i] = 220;
+    // }
+    return 0;
+}
+
+
+
+
+u32 str_len(i8 * str){
+    u32 len = 0;
     while(str[len])len++;
     return len;
 }

@@ -1,8 +1,6 @@
 #ifndef PIXELS_WASM_H
 #define PIXELS_WASM_H
 
-
-
 typedef unsigned char u8;
 typedef char i8;
 typedef int i32;
@@ -17,13 +15,13 @@ static u8 file_name[STR_SIZE];
 
 
 void writeImageFromFIleToMemory(i32 size);
-void writeFileFromImageToMemory( i32 size);
+i32 writeFileFromImageToMemory();
 int printf(i8 * str, ...);
 u8 * get_file_buffer_ptr(void);
 u8 * get_image_buffer_ptr(void);
 u8 * get_file_name_ptr(void);
 void empty_buffers(void);
-u8 str_len(i8 * str);
+u32 str_len(i8 * str);
 
 
 #endif
