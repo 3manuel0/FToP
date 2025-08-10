@@ -64,11 +64,16 @@ i32 writeFileFromImageToMemory(){
         i++;
     }
     file_name[i] = 0;
-    // printf("last %d and before last %d", file_name[i], file_name[i-1]);
-    // for(u32 i = 1; i < BUFF_SIZE; i++){
-    //     image_array[i] = 220;
-    // }
-    return 0;
+    i++;
+    u32 file_size = *(u32 *)(image_array + i );
+    i += 4;
+    printf("%d", file_size);
+
+    for(u32 j = 1; j < file_size; j++){
+        file_array[j] = image_array[i];
+        i++;
+    }
+    return file_size;
 }
 
 

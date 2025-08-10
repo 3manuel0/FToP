@@ -144,7 +144,6 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
       // reader loaded successfully
       reader.onload = (e) => {
         result = e.target.result;
-        // console.log(result);
         if (size > BUFF_SIZE - 500) {
           textArea.innerHTML = `<p style="color:red; font-weight:bold;">file size is bigger than what is allowed: ${
             BUFF_SIZE - 500
@@ -173,29 +172,30 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
                 )
               );
             };
-            const text_buffer = new Uint8Array(buffer, file_name_ptr, STR_SIZE);
-            console.log(
-              new TextDecoder().decode(text_buffer),
-              text_buffer,
-              file_name_ptr
-            );
-            /* check if file is bigger than ~ 1.9mb -> 800*600*4
-         minus 40bytes for extension and length */
           } else {
-            // empty_buffers();
             const img = UPNG.decode(result);
             const img_data = new Uint8Array(UPNG.toRGBA8(img)[0]);
             wasmMemoryView.set(img_data, image_buffer_ptr);
             const text_buffer = new Uint8Array(buffer, file_name_ptr, STR_SIZE);
             const file_size = writeFileFromImageToMemory();
-            console.log(
-              new TextDecoder().decode(text_buffer),
-              image_buffer_ptr,
-              file_name_ptr
+            const out_ext = get_str(file_name_ptr);
+            const file_buffer = new Uint8Array(
+              buffer,
+              file_buffer_ptr,
+              file_size
             );
+            const blob = new Blob([file_buffer]);
+            document.getElementById("dwn").onclick = () => {
+              Download_file(blob, out_ext);
+            };
+            document.getElementById("dwn").innerText =
+              "Download ." + out_ext + " file";
+            textArea.innerHTML =
+              `<p style="font-weight:bold;">file extension : ${out_ext}</p>` +
+              `<p style="font-weight:bold;">file size : ${file_size} bytes</p>` +
+              `<p style="font-weight:bold;">Click on Download to Download the output file</p>`;
+            showDetails;
             console.log(text_buffer);
-            console.log(img_data);
-            console.log(new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE));
           }
         }
         reader.onerror = (e) => {
@@ -244,6 +244,17 @@ const Download_img = (data) => {
   URL.revokeObjectURL(url);
 };
 
+const Download_file = (blob, ext) => {
+  const url = URL.createObjectURL(blob);
+  // Trigger download
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "output." + ext;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
 // bind buttons to functions
 showCanvasBtn.onclick = () => showCanvas();
 showDetailsBtn.onclick = () => showDetails();
