@@ -178,24 +178,28 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
             wasmMemoryView.set(img_data, image_buffer_ptr);
             const text_buffer = new Uint8Array(buffer, file_name_ptr, STR_SIZE);
             const file_size = writeFileFromImageToMemory();
-            const out_ext = get_str(file_name_ptr);
-            const file_buffer = new Uint8Array(
-              buffer,
-              file_buffer_ptr,
-              file_size
-            );
-            const blob = new Blob([file_buffer]);
-            document.getElementById("dwn").onclick = () => {
-              Download_file(blob, out_ext);
-            };
-            document.getElementById("dwn").innerText =
-              "Download ." + out_ext + " file";
-            textArea.innerHTML =
-              `<p style="font-weight:bold;">file extension : ${out_ext}</p>` +
-              `<p style="font-weight:bold;">file size : ${file_size} bytes</p>` +
-              `<p style="font-weight:bold;">Click on Download to Download the output file</p>`;
-            showDetails;
-            console.log(text_buffer);
+            if (file_size == 0) {
+              textArea.innerHTML = `<p style="color:red; font-weight:bold;">INVALID SIGNATURE ERROR01: size=0</p>`;
+            } else {
+              const out_ext = get_str(file_name_ptr);
+              const file_buffer = new Uint8Array(
+                buffer,
+                file_buffer_ptr,
+                file_size
+              );
+              const blob = new Blob([file_buffer]);
+              document.getElementById("dwn").onclick = () => {
+                Download_file(blob, out_ext);
+              };
+              document.getElementById("dwn").innerText =
+                "Download ." + out_ext + " file";
+              textArea.innerHTML =
+                `<p style="font-weight:bold;">file extension : ${out_ext}</p>` +
+                `<p style="font-weight:bold;">file size : ${file_size} bytes</p>` +
+                `<p style="font-weight:bold;">Click on Download to Download the output file</p>`;
+              showDetails;
+              console.log(text_buffer);
+            }
           }
         }
         reader.onerror = (e) => {
