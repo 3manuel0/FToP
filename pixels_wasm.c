@@ -21,6 +21,7 @@ void empty_buffers(void){
 }
 
 void writeImageFromFIleToMemory(i32 size){
+    
     u8 * ext = file_name;
     while(*ext){
         if(*ext == '.'){

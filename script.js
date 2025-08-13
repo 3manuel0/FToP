@@ -57,10 +57,10 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
         if (str[i] === "%") {
           switch (str[i + 1]) {
             case "f":
-              let float = new Float64Array(buffer, args_ptrs + argsIndex, 1)[0];
+              let float = new Float32Array(buffer, args_ptrs + argsIndex, 1)[0];
               args.push(float);
               f_str += float;
-              argsIndex += 8;
+              argsIndex += 4;
               i += 2;
               break;
             case "d":
