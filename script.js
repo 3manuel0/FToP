@@ -1,17 +1,3 @@
-// thanks to Tsoding(Alexey Kutepov) for this proxy
-function make_environment(env) {
-  return new Proxy(env, {
-    get(target, prop, receiver) {
-      if (env[prop] !== undefined) {
-        return env[prop].bind(env);
-      }
-      return (...args) => {
-        throw new Error(`NOT IMPLEMENTED: ${prop} ${args}`);
-      };
-    },
-  });
-}
-
 let wasm;
 const fileInput = document.getElementById("file");
 const canvas = document.getElementById("canvas");
@@ -27,12 +13,12 @@ textArea.style.height = height + "px";
 
 // getting Cstring length in memory
 const str_len = wasmlib.str_len;
-
 // getting a Cstring from wasm memory
 const get_str = wasmlib.get_str;
+
 // Instintiating webassembly
 WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
-  env: make_environment({
+  env: wasmlib.make_environment({
     printf: wasmlib.printf,
   }),
 }).then((w) => {
