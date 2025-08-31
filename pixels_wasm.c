@@ -80,7 +80,7 @@ i32 writeFileFromImageToMemory(){
     i += 4;
     printf("%d", file_size);
 
-    for(u32 j = 1; j < file_size; j++){
+    for(u32 j = 0; j < file_size; j++){
         file_array[j] = image_array[i];
         i++;
     }

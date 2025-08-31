@@ -85,6 +85,7 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
           } else {
             const img = UPNG.decode(result);
             const img_data = new Uint8Array(UPNG.toRGBA8(img)[0]);
+            createCanvas(img_data);
             wasmMemoryView.set(img_data, image_buffer_ptr);
             const text_buffer = new Uint8Array(buffer, file_name_ptr, STR_SIZE);
             const file_size = writeFileFromImageToMemory();
@@ -101,13 +102,15 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
               document.getElementById("dwn").onclick = () => {
                 Download_file(blob, out_ext);
               };
+              console.log(img_data);
+              console.log(file_buffer);
               document.getElementById("dwn").innerText =
                 "Download ." + out_ext + " file";
               textArea.innerHTML =
                 `<p style="font-weight:bold;">file extension : ${out_ext}</p>` +
                 `<p style="font-weight:bold;">file size : ${file_size} bytes</p>` +
                 `<p style="font-weight:bold;">Click on Download to Download the output file</p>`;
-              showDetails;
+              showDetails();
               console.log(text_buffer);
             }
           }
@@ -119,8 +122,9 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
     }
   });
   //const file_buffer = new Uint8Array(buffer, file_buffer_ptr, BUFF_SIZE);
-  //const image_buffer = new Uint8Array(buffer, image__buffer_ptr, BUFF_SIZE);
+  const image_buffer = new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE);
   // empty_buffers();
+  console.log(image_buffer);
   console.log(buffer);
   // console.log(get_str(file_name_ptr));
 });
