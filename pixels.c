@@ -14,9 +14,10 @@
 
 
 int main(int argc, char**argV){
-    if(argc > 2){
-        printf("use 1 argument\n");
-        getchar();
+    char a[4] = "3MAN";
+    printf("a = %x\n", *(int *)a);
+    if(argc != 2){
+        printf("This only works with 1 argument\n");
         exit(EXIT_FAILURE);
     }
     printf("%s\n", argV[1]);
@@ -82,20 +83,22 @@ void writeFileToIamge(char* file, int c){
         exit(1);
     }
 
+    int sig = 0x4e414d33;
     // size_t count =  extLength+1;
     // writing extention to a example svg 
+    memcpy(a, &sig, sizeof(int));
     for(int i = 0; i <= extLength - 1; i++){
-        a[i] = file[(c + 1)+i];
+        a[4 + i] = file[(c + 1)+i];
         printf("%c %d\t", file[(c + 1)+i], file[(c + 1)+i]);
     }
 
     printf("\nftell = %zu %c%c%c%d\n", ftell(fp), a[0], a[1],a[2],a[3]);
 
-    int j;
+    int j = 0;
     char * int_bytes = (char *)(&bytes);
     // writing the size of the file in bytes to an int
     for(int i = 0; i < 4; i++){
-        a[extLength + i] = int_bytes[i];
+        a[extLength + 4 + i] = int_bytes[i];
         printf("%d %ld\n", int_bytes[i], bytes);
     }
 
@@ -104,7 +107,7 @@ void writeFileToIamge(char* file, int c){
     }
 
     printf("ext_len: %d\n", extLength);
-    for (size_t i = extLength + 4; i < (800 * 600 * 4) - 200; i++) {
+    for (size_t i = extLength + 8; i < (800 * 600 * 4) - 200; i++) {
         ch = fgetc(fp);
         a[i] = ch;
         if(j >= bytes ){
@@ -113,7 +116,12 @@ void writeFileToIamge(char* file, int c){
         }
         j++;
     }
-
+    for(int i = 0; i < 30; i++){
+        if(a[i] < 32 || a[i] > 126){
+            printf(" %d ", a[i]);
+        }else
+            printf("%c", a[i]);
+    }
     
     fclose(fp); 
     stbi_write_png("output.png", 800,600, 4, a, 0);
@@ -127,8 +135,8 @@ void writeImageToFile(char* fileName){
     int byte_len;
     char file_name[255] = "output.";
     int i = 0;
-    while (img.data[i]) {
-        file_name[7 + i] = img.data[i];
+    while (img.data[i + 4]) {
+        file_name[7 + i] = img.data[i + 4];
         i++;
     }
     for(int i = 0; i < 10; i++)
