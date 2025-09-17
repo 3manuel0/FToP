@@ -14,8 +14,8 @@
 
 
 int main(int argc, char**argV){
-    char a[4] = "3MAN";
-    printf("a = %x\n", *(int *)a);
+    // char a[4] = "3MAN";
+    // printf("a = %x\n", *(int *)a);
     if(argc != 2){
         printf("This only works with 1 argument\n");
         exit(EXIT_FAILURE);
@@ -133,14 +133,17 @@ void writeImageToFile(char* fileName){
     Image img = {0};
     img.data = stbi_load(fileName, &img.x, &img.y, &img.comp, 4);
     int byte_len;
+    int sig = 0;
+    memcpy(&sig, img.data, sizeof(int));
+    printf("is the sig correct = %d\n", sig == 0x4e414d33);
     char file_name[255] = "output.";
     int i = 0;
     while (img.data[i + 4]) {
         file_name[7 + i] = img.data[i + 4];
         i++;
     }
-    for(int i = 0; i < 10; i++)
-        printf("%c", img.data[i]);
+    // for(int i = 0; i < 10; i++)
+    //     printf("%c", img.data[i]);
     file_name[7+i] = 0;
     int len = strlen((char *)img.data);
     memcpy(&byte_len, img.data + len + 1, sizeof(int));
