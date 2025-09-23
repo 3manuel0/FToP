@@ -1,6 +1,6 @@
 # FToP
 
-⚠️ **Note:** This project isn't finished yet — I'm still working on it to fix bugs and things might break or change.
+⚠️ **Note:This project isn't finished yet — I'm still working on it to fix bugs and things might break or change.**
 
 A fun project in C and then compile it to wasm to use with js.
 
@@ -14,7 +14,7 @@ A fun project in C and then compile it to wasm to use with js.
 
 ### Libraries used:
 
-I used [`stb_image`](https://github.com/nothings/stb/blob/master/stb_image.h) and [`stb_image_write`](https://github.com/nothings/stb/blob/master/stb_image_write.h) to parse and read PNG images, mainly to avoid implementing zlib myself.  
+I used [`stb_image`](https://github.com/nothings/stb/blob/master/stb_image.h) and [`stb_image_write`](https://github.com/nothings/stb/blob/master/stb_image_write.h) to parse and read PNG file, mainly to avoid implementing zlib myself.  
 They're part of the [stb](https://github.com/nothings/stb) collection — just simple, single-header libraries that do exactly what you need without getting in the way.  
 Really appreciated how easy they made things.
 
