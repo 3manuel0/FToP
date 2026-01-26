@@ -5,6 +5,7 @@
 
 typedef unsigned char u8;
 typedef int i32;
+const static char SIGNITURE[5] = "3MAN";
 
 typedef struct {
     u8 * data;

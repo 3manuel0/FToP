@@ -19,7 +19,7 @@ const get_str = wasmlib.get_str;
 // Instintiating webassembly
 WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
   env: wasmlib.make_environment({
-    printf: wasmlib.printf,
+    wprintf: wasmlib.printf,
   }),
 }).then((w) => {
   wasm = w;
@@ -78,8 +78,8 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
                   [new Uint8Array(buffer, image_buffer_ptr, BUFF_SIZE)],
                   width,
                   height,
-                  0
-                )
+                  0,
+                ),
               );
             };
           } else {
@@ -96,7 +96,7 @@ WebAssembly.instantiateStreaming(fetch("pixels.wasm"), {
               const file_buffer = new Uint8Array(
                 buffer,
                 file_buffer_ptr,
-                file_size
+                file_size,
               );
               const blob = new Blob([file_buffer]);
               document.getElementById("dwn").onclick = () => {

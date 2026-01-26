@@ -36,18 +36,18 @@ void writeImageFromFIleToMemory(i32 size){
     for(offset = 0; offset < 4; offset++){
         image_array[offset] = SIGNITURE[offset];
     }
-    printf("extension= %s %d", ext, size);
+    wprintf("extension= %s %d", ext, size);
     for(u32 i = 0; i < strlen; offset++){
         image_array[offset] = ext[i];
         i++;
     }
-    printf("offset = %d", size);
+    wprintf("offset = %d", size);
     image_array[offset] = 0;
     offset++;
     u8 * size_in_bytes = (u8 *) &size; 
     for(i32 i = 0; i < 4; i++){
         image_array[offset] = size_in_bytes[i];
-        printf("byte = %d", size_in_bytes[i]);
+        wprintf("byte = %d", size_in_bytes[i]);
         offset++;
     } 
     u32 j = 0;
@@ -71,14 +71,14 @@ i32 writeFileFromImageToMemory(){
     u32 i = 4;
     while(image_array[i]){
         file_name[i - 4] = image_array[i];
-        printf("%d ext_char %d", i, file_name[i - 4]);
+        wprintf("%d ext_char %d", i, file_name[i - 4]);
         i++;
     }
     file_name[i] = 0;
     i++;
     u32 file_size = *(u32 *)(image_array + i );
     i += 4;
-    printf("%d", file_size);
+    wprintf("%d", file_size);
 
     for(u32 j = 0; j < file_size; j++){
         file_array[j] = image_array[i];
